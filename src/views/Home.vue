@@ -1,27 +1,31 @@
 <template>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <div class="home">
+  <div class="home container mt-4">
     <div v-if="categories.length">
-    <div v-for="category in categories" :key="category.id" class="category-section">
-      <h2>{{ category.name }}</h2>
-      <ul>
-        <li v-for="item in inventory.filter(item => item.category.id === category.id)" :key="item.id">
-          <div class="details">
-            <h3 @click="showItemDetails(item)">{{ item.name }}</h3>
-            <p>{{ item.model }}</p>
-            <p>Quantity: {{ item.quantity }}</p>
-            <p>${{ item.price }}</p>
-            <p :style="{ color: getColor(item.condition.name) }">{{ item.condition.name }}</p>
-            <p v-if="item.source">Source: {{ item.source.name }}</p>
-            <p v-if="item.info">Info: {{ item.info }}</p>
-            <p>Total Value: {{ totalValue(item) }}</p>
-            <p v-if="item.modifiedBy">Modified By: {{ item.modifiedBy }} at {{ formatLastModified(item.lastModified) }}</p>
-          </div>
-            <div :class="{icon: true, fav: item.isFav}" @click="handleUpdate(item)" v-if="isAdmin">
-              <span class="material-icons" :class="{ fav: item.isFav && isAdmin }">star</span>
+      <div v-for="category in categories" :key="category.id" class="category-section mb-4">
+        <h4 class="item-field category-name">{{ category.name }}</h4>
+        <ul class="list-group">
+          <li v-for="item in inventory.filter(item => item.category.id === category.id)" :key="item.id"
+            class="list-group-item d-flex justify-content-between align-items-center mb-2">
+            <div class="item-details d-flex flex-wrap align-items-center w-100">
+              <h5 @click="showItemDetails(item)" class="item-field item-name medium-font">{{ item.name }}</h5>
+              <p class="item-field-wide">{{ item.model }}</p>
+              <p class="item-field">{{ item.quantity }}</p>
+              <p class="item-field">${{ item.price }}</p>
+              <p :style="{ color: getColor(item.condition.name) }" class="item-field">{{ item.condition.name }}</p>
+              <p v-if="item.source" class="item-field">{{ item.source.name }}</p>
+              <p class="item-field">Total <b>${{ totalValue(item) }}</b></p>
+              <p v-if="item.info" class="item-field-wide">Info: {{ item.info }}</p>
+              <p v-if="item.modifiedBy" class="item-field modified-field smaller-font">{{ item.modifiedBy }} at
+                {{ formatLastModified(item.lastModified) }}</p>
+              <div class="item-actions ml-auto">
+                <div :class="{ icon: true, fav: item.isFav }" @click="isAdmin && handleUpdate(item)">
+                  <span class="material-icons" :class="{ fav: item.isFav }">star</span>
+                </div>
+                <button @click="handleEdit(item)" v-if="isAdmin" class="btn btn-primary btn-sm ml-4">Edit</button>
+                <button @click="handleDelete(item)" v-if="isAdmin" class="btn btn-danger btn-sm ml-4">Delete</button>
+              </div>
             </div>
-            <button @click="handleEdit(item)" v-if="isAdmin">Edit</button>
-            <button @click="handleDelete(item)" v-if="isAdmin">Delete</button>
           </li>
         </ul>
       </div>
@@ -29,17 +33,25 @@
     <CreateItemForm v-if="isAdmin && !editingItem" />
     <EditItemForm v-if="editingItem" :item="editingItem" @editComplete="editComplete" @editCancel="editCancel" />
 
-    <div v-if="showItemModal" class="modal">
-      <div class="modal-content">
-        <span class="close" @click="showItemModal = false">&times;</span>
-        <h3>{{ selectedItem.name }}</h3>
-        <p>Model: {{ selectedItem.model }}</p>
-        <p>Quantity: {{ selectedItem.quantity }}</p>
-        <p>Price: {{ selectedItem.price }}</p>
-        <p :style="{ color: getColor(selectedItem.condition.name) }">{{ selectedItem.condition.name }}</p>
-        <p v-if="selectedItem.source">Source: {{ selectedItem.source.name }}</p>
-        <p v-if="selectedItem.info">Info: {{ selectedItem.info }}</p>
-        <p>Total Value: {{ totalValue(selectedItem) }}</p>
+    <div v-if="showItemModal" class="modal fade show d-block" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ selectedItem.name }}</h5>
+            <span class="material-icons btn-close" @click="showItemModal = false">close</span>
+          </div>
+          <div class="modal-body">
+            <p><b>Model:</b> {{ selectedItem.model }}</p>
+            <p><b>Category: </b>{{ selectedItem.category.name }}</p>
+            <p><b>Quantity:</b> {{ selectedItem.quantity }}</p>
+            <p><b>Price for 1: </b> ${{ selectedItem.price }}</p>
+            <p :style="{ color: getColor(selectedItem.condition.name) }">{{ selectedItem.condition.name }}</p>
+            <p v-if="selectedItem.source"><b>Source:</b> {{ selectedItem.source.name }}</p>
+            <p v-if="selectedItem.info"><b>Info:</b> {{ selectedItem.info }}</p>
+            <p><b>Total Value:</b> {{ totalValue(selectedItem) }}</p>
+            <p>Last modified by {{ selectedItem.modifiedBy }} at {{ formatLastModified(selectedItem.lastModified) }}</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -48,8 +60,8 @@
 <script>
 import CreateItemForm from './../components/CreateItemForm.vue'
 import EditItemForm from './../components/EditItemForm.vue'
-import { db, firebase } from '../firebase/config'
-import { collection, onSnapshot, deleteDoc, doc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore'
+import { db } from '../firebase/config'
+import { collection, onSnapshot, deleteDoc, doc, updateDoc, getDoc } from 'firebase/firestore'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { watchEffect } from '@vue/runtime-core'
 
@@ -94,18 +106,21 @@ export default {
       this.selectedItem = item
       this.showItemModal = true
     },
+    closeModal() {
+      this.showItemModal = false;
+    },
     getColor(conditionName) {
-    if (conditionName === 'New') {
-    return 'green';
-    } else if (conditionName === 'Used') {
-    return 'orange';
-    } else if (conditionName === 'Damaged') {
-    return 'red';
-    } else {
-    return 'black'; // Default color
-  }
-},
-formatLastModified(date) {
+      if (conditionName === 'New') {
+        return 'limegreen';
+      } else if (conditionName === 'Used') {
+        return 'orange';
+      } else if (conditionName === 'Damaged') {
+        return 'red';
+      } else {
+        return 'black'; // Default color
+      }
+    },
+    formatLastModified(date) {
       const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
       return new Date(date).toLocaleString('en-US', options);
     }
@@ -121,7 +136,7 @@ formatLastModified(date) {
         }
       }
     })
-    
+
     // Fetching inventory
     const colRefInventory = collection(db, 'inventory')
     const unsubInventory = onSnapshot(colRefInventory, snapshot => {
@@ -155,43 +170,85 @@ formatLastModified(date) {
 .home ul {
   padding: 0;
 }
-.home li {
-  list-style-type: none;
-  background: #fff;
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 12px;
+
+.home .item-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+}
+
+.home .item-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  margin: 5px;
 }
-.home li .details {
-  margin-right: auto;
+
+.home .item-field {
+  margin-right: 5px;
+  flex: 1.9;
 }
+
+.home .modified-field {
+  color: gray;
+  flex: 1;
+  margin-left: 10px;
+}
+
+.home .smaller-font {
+  font-size: 12px;
+}
+
+.home .medium-font {
+  margin-top: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.home .item-field-wide {
+  margin-left: 30px;
+  margin-right: 10px;
+  flex: 1.9;
+}
+
+.home .item-name {
+  color: #61008f;
+}
+
 .home li h3 {
   margin: 0;
-  margin-bottom: 4px;
+  margin-right: 10px;
   cursor: pointer;
-  color: #007bff;
+  color: #61008f;
 }
+
 .home li h3:hover {
   text-decoration: underline;
 }
+
 .home li p {
   margin: 0;
+  margin-right: 10px;
 }
+
 .icon {
   color: #bbbbbb;
   cursor: pointer;
+  margin-right: 10px;
 }
+
 .fav {
   color: orange !important;
 }
-button {
-  margin-left: 10px;
-  cursor: pointer;
-}
+
 .category-section {
   margin-bottom: 20px;
+}
+
+.home .category-name {
+  font-weight: bold;
 }
 
 .modal {
@@ -203,7 +260,13 @@ button {
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-dialog {
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
 }
 
 .modal-content {
@@ -211,22 +274,38 @@ button {
   margin: auto;
   padding: 20px;
   border: 1px solid #888;
-  width: 80%;
-  max-width: 500px;
   border-radius: 10px;
+  position: relative;
 }
 
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.modal-header h5 {
+  margin-bottom: 0;
+  color: #333;
+}
+
+.modal-body p {
+  margin-bottom: 10px;
+}
+
+.modal-header .modal-title {
+  font-size: 24px;
   font-weight: bold;
+  color: #333;
+  margin-right: auto;
 }
 
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
+.btn-close {
   cursor: pointer;
+  font-size: 24px;
+  color: #888;
+  margin-left: auto;
 }
 </style>

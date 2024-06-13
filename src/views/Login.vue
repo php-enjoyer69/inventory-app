@@ -1,21 +1,29 @@
 <template>
-  <form @submit.prevent="handleSubmit">
-    <h2>Login</h2>
+  <div>
+    <div>
+      <h5 class="bold-heading">Login</h5>
 
-    <label for="email">Email:</label>
-    <input type="email" name="email" v-model="email" required>
+      <form @submit.prevent="handleSubmit" class="form">
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" name="email" v-model="email" class="form-control" required>
+        </div>
 
-    <label for="password">Password:</label>
-    <input type="password" name="password" v-model="password" required>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" name="password" v-model="password" class="form-control" required>
+        </div>
 
-    <button>Login</button>
-  </form>
-  <p>{{ errorCode }}</p>
-  <p>{{ errorMsg }}</p>
+        <button class="btn btn-primary btn-sm" type="submit">Login</button>
+      </form>
+
+      <p v-if="errorCode">{{ errorCode }}</p>
+      <p v-if="errorMsg">{{ errorMsg }}</p>
+    </div>
+  </div>
 </template>
 
 <script>
-
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 
 export default {
@@ -23,25 +31,22 @@ export default {
     return {
       email: '',
       password: '',
-      error: '',
-      errorMsg: '',
-      errorCode:''
+      errorCode: '',
+      errorMsg: ''
     }
   },
   methods: {
-    async handleSubmit(){
-      console.log(this.email, this.password)
-
+    async handleSubmit() {
       try {
         const res = await signInWithEmailAndPassword(getAuth(), this.email, this.password)
         if (!res) {
           throw new Error('Could not log in')
         }
-        this.error = null
+        this.errorCode = ''
+        this.errorMsg = ''
         this.$router.push('/home')
-      }
-      catch (err) {
-        this.errorCode = err.code 
+      } catch (err) {
+        this.errorCode = err.code
         this.errorMsg = err.message
       }
     }
@@ -49,41 +54,25 @@ export default {
 }
 </script>
 
-<style>
-.home ul {
-  padding: 0;
-}
-.home li {
-  list-style-type: none;
-  background: #fff;
+<style scoped>
+.form {
   padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  max-width: 45%;
+  flex-direction: column;
 }
-.home li .details {
-  margin-right: auto;
+
+.btn-primary {
+  background-color: #61008f !important;
+  color: #fff !important;
+  margin-top: 5px;
 }
-.home li h3 {
-  margin: 0;
-  margin-bottom: 4px;
-}
-.home li p {
-  margin: 0;
-}
-.icon {
-  color: #bbbbbb;
-  cursor: pointer;
-}
-.fav {
-  color: red;
-}
-button {
-  margin-left: 10px;
-  cursor: pointer;
-}
-.genre-section {
-  margin-bottom: 20px;
+
+.bold-heading {
+  font-weight: bold;
+  margin-bottom: -5px;
+  margin-top: 30px;
 }
 </style>

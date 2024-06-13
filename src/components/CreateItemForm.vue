@@ -1,68 +1,103 @@
 <template>
+  <h5><b>Add a New Item</b></h5>
   <form @submit.prevent="handleSubmit">
-    <h3>Add a New Item</h3>
 
-    <label for="name">Item name:</label>
-    <input type="text" name="name" v-model="name" required>
-
-    <label for="model">Item model:</label>
-    <input type="text" name="model" v-model="model" required>
-
-    <label for="category">Item category:</label>
-    <div>
-      <select v-model="selectedCategory" required>
-        <option v-for="category in categories" :key="category.id" :value="category">
-          {{ category.name }}
-        </option>
-      </select>
-      <button type="button" @click="showAddCategoryModal = true">Add New Category</button>
+    <div class="mb-3">
+      <label for="name" class="form-label">Item name: </label>
+      <input type="text" class="form-control" name="name" v-model="name" required>
     </div>
 
-    <label for="quantity">Item quantity:</label>
-    <input type="number" name="quantity" v-model.number="quantity" required>
-
-    <label for="price">Item price:</label>
-    <input type="number" name="price" v-model.number="price" required>
-
-    <label for="condition">Item condition:</label>
-    <select v-model="selectedCondition" required>
-      <option v-for="condition in conditions" :key="condition.id" :value="condition">
-        {{ condition.name }}
-      </option>
-    </select>
-
-    <label for="info">Additional info:</label>
-    <input type="text" name="info" v-model="info">
-
-    <label for="source">Item source:</label>
-    <div>
-      <select v-model="selectedSource" required>
-        <option v-for="source in sources" :key="source.id" :value="source">
-          {{ source.name }}
-        </option>
-      </select>
-      <button type="button" @click="showAddSourceModal = true">Add New Source</button>
+    <div class="mb-3">
+      <label for="model" class="form-label">Item model: </label>
+      <input type="text" class="form-control" name="model" v-model="model" required>
     </div>
 
-    <button>Add Item</button>
-
-    <div v-if="showAddCategoryModal" class="modal">
-      <div class="modal-content">
-        <span class="close" @click="showAddCategoryModal = false">&times;</span>
-        <h4>Add New Category</h4>
-        <label for="newCategoryName">Category name:</label>
-        <input type="text" v-model="newCategoryName">
-        <button type="button" @click="addNewCategory">Add Category</button>
+    <div class="mb-3">
+      <label for="category" class="form-label">Item category: </label>
+      <div class="d-flex">
+        <select class="form-select" v-model="selectedCategory" required>
+          <option v-for="category in categories" :key="category.id" :value="category">
+            {{ category.name }}
+          </option>
+        </select>
+        <button type="button" class="btn btn-secondary ms-2" @click="showAddCategoryModal = true">Add New
+          Category</button>
       </div>
     </div>
 
-    <div v-if="showAddSourceModal" class="modal">
-      <div class="modal-content">
-        <span class="close" @click="showAddSourceModal = false">&times;</span>
-        <h4>Add New Source</h4>
-        <label for="newSourceName">Source name:</label>
-        <input type="text" v-model="newSourceName">
-        <button type="button" @click="addNewSource">Add Source</button>
+    <div class="mb-3">
+      <label for="quantity" class="form-label">Item quantity: </label>
+      <input type="number" class="form-control" name="quantity" v-model.number="quantity" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="price" class="form-label">Item price: </label>
+      <input type="number" class="form-control" name="price" v-model.number="price" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="condition" class="form-label">Item condition: </label>
+      <select class="form-select" v-model="selectedCondition" required>
+        <option v-for="condition in conditions" :key="condition.id" :value="condition">
+          {{ condition.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="info" class="form-label">Additional info: </label>
+      <input type="text" class="form-control" name="info" v-model="info">
+    </div>
+
+    <div class="mb-3">
+      <label for="source" class="form-label">Item source: </label>
+      <div class="d-flex">
+        <select class="form-select" v-model="selectedSource" required>
+          <option v-for="source in sources" :key="source.id" :value="source">
+            {{ source.name }}
+          </option>
+        </select>
+        <button type="button" class="btn btn-secondary ms-2" @click="showAddSourceModal = true">Add New Source</button>
+      </div>
+    </div>
+
+    <button class="btn btn-primary">Add Item</button>
+
+    <div v-if="showAddCategoryModal" class="modal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add New Category</h5>
+            <button type="button" class="btn-close" @click="showAddCategoryModal = false"></button>
+          </div>
+          <div class="modal-body">
+            <label for="newCategoryName" class="form-label">Category name:</label>
+            <input type="text" class="form-control" v-model="newCategoryName">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="showAddCategoryModal = false">Close</button>
+            <button type="button" class="btn btn-primary" @click="addNewCategory">Add Category</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showAddSourceModal" class="modal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add New Source</h5>
+            <button type="button" class="btn-close" @click="showAddSourceModal = false"></button>
+          </div>
+          <div class="modal-body">
+            <label for="newSourceName" class="form-label">Source name:</label>
+            <input type="text" class="form-control" v-model="newSourceName">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="showAddSourceModal = false">Close</button>
+            <button type="button" class="btn btn-primary" @click="addNewSource">Add Source</button>
+          </div>
+        </div>
       </div>
     </div>
   </form>
@@ -109,7 +144,7 @@ export default {
     const colRefCategories = collection(db, 'categories')
     const snapshotCategories = await getDocs(colRefCategories)
     this.categories = snapshotCategories.docs.map(doc => ({ ...doc.data(), id: doc.id }))
-    
+
     const colRefSources = collection(db, 'sources')
     const snapshotSources = await getDocs(colRefSources)
     this.sources = snapshotSources.docs.map(doc => ({ ...doc.data(), id: doc.id }))
@@ -183,11 +218,13 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 form {
   padding: 10px;
   margin-top: 10px;
-  border: 1px dashed #c3c8ce;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  max-width: 45%;
 }
 
 .modal {
@@ -199,15 +236,14 @@ form {
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
   background-color: #fefefe;
   margin: auto;
   padding: 20px;
-  border
-  : 1px solid #888;
+  border: 1px solid #888;
   width: 80%;
 }
 
@@ -223,5 +259,9 @@ form {
   color: black;
   text-decoration: none;
   cursor: pointer;
+}
+
+.mb-3 {
+  margin-bottom: 15px;
 }
 </style>

@@ -14,33 +14,48 @@ export default {
 </script>
 
 <style>
-body {
-  background: #f2f2f2;
-}
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(to top right, #eae1f0, #ffffff);
+  font-family: 'Roboto', 'Helvetica', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
 }
+
 .container {
-  max-width: 800px;
+  max-width: 1250px;
   margin: 0 auto;
 }
-form label, form input {
-  display: block;
+
+.btn {
+  background-color: #61008f !important;
+  color: #fff !important;
 }
-form input {
-  padding: 4px;
+
+.btn-primary {
+  border-color: #61008f !important;
+}
+
+.btn-danger {
+  border-color: #61008f !important;
+}
+
+a {
+  color: #61008f !important;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+form {
+  padding: 10px;
   margin-top: 10px;
-  margin-bottom: 20px;
-}
-button {
-  background: #0ec58e;
-  color: #fff;
-  border: 0;
-  border-radius: 6px;
-  padding: 6px;
-  cursor: pointer;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #fdf9ff;
 }
 </style>
